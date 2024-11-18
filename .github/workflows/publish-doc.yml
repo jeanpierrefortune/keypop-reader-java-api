@@ -37,7 +37,7 @@ jobs:
           fi
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
 
       - name: Set scripts permissions
         run: |
@@ -52,12 +52,12 @@ jobs:
           chmod +x ./scripts/prepare_javadoc.sh
           ./scripts/prepare_javadoc.sh ${{ github.event.repository.name }} ${{ steps.version.outputs.version }} ${{ steps.version.outputs.is_snapshot }}
 
-      - name: Commit and push documentation
-        working-directory: ${{ github.event.repository.name }}
-        run: |
-          git config user.email "${{ github.event.repository.name }}-bot@eclipse.org"
-          git config user.name "Eclipse Keypop Bot"
-          git add -A
-          git commit --allow-empty -m "docs: update documentation from GitHub Actions job ${GITHUB_WORKFLOW}-${GITHUB_RUN_NUMBER}"
-          git log --graph --abbrev-commit --date=relative -n 5
-          git push origin HEAD:gh-pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./${{ github.event.repository.name }}
+          enable_jekyll: true
+          user_name: 'Eclipse Keypop Bot'
+          user_email: '${{ github.event.repository.name }}-bot@eclipse.org'
+          commit_message: 'docs: update documentation from GitHub Actions job ${GITHUB_WORKFLOW}-${GITHUB_RUN_NUMBER}'
