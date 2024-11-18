@@ -24,9 +24,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set scripts permissions
-        run: chmod +x scripts/*.sh
-
       - name: Extract version
         id: version
         run: |
@@ -41,6 +38,11 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
+
+      - name: Set scripts permissions
+        run: |
+          chmod +x scripts/*.sh
+          chmod +x gradlew
 
       - name: Generate Javadoc
         run: ./gradlew javadoc
