@@ -24,6 +24,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set scripts permissions
+        run: chmod +x scripts/*.sh
+
       - name: Extract version
         id: version
         run: |
