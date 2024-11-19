@@ -59,7 +59,6 @@ jobs:
           publish_dir: ./${{ github.event.repository.name }}
           enable_jekyll: true
           keep_files: true
-          keep_files: true
           user_name: 'Eclipse Keypop Bot'
           user_email: '${{ github.event.repository.name }}-bot@eclipse.org'
           commit_message: 'docs: update documentation from GitHub Actions job ${GITHUB_WORKFLOW}-${GITHUB_RUN_NUMBER}'
