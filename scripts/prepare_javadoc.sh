@@ -52,18 +52,17 @@ echo "|:---:|---|" >> list_versions.md
 # Get the list of directories sorted by version number
 sorted_dirs=$(ls -d [0-9]*/ | cut -f1 -d'/' | sort -Vr)
 
-# Add latest-stable entry if it exists
-if [ -L "latest-stable" ]; then
-    latest_stable=$(ls -d [0-9]*/ | grep -v SNAPSHOT | cut -f1 -d'/' | sort -Vr | head -n1)
-    if [ ! -z "$latest_stable" ]; then
-        echo "| latest-stable ($latest_stable) | [API documentation](latest-stable) |" >> list_versions.md
-    fi
-fi
+# Find the latest stable version (first non-SNAPSHOT, non-RC version)
+latest_stable=$(ls -d [0-9]*/ | grep -v SNAPSHOT | grep -v "\-rc" | cut -f1 -d'/' | sort -Vr | head -n1)
 
 # Loop through each sorted directory
 for directory in $sorted_dirs
 do
-  echo "| $directory | [API documentation]($directory) |" >> list_versions.md
+    # If this is the stable version, write latest-stable entry first
+    if [ "$directory" = "$latest_stable" ]; then
+        echo "| latest-stable ($latest_stable) | [API documentation](latest-stable) |" >> list_versions.md
+    fi
+    echo "| $directory | [API documentation]($directory) |" >> list_versions.md
 done
 
 echo "Computed all versions:"
