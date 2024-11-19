@@ -30,11 +30,17 @@ mkdir $version
 echo "Copy javadoc files..."
 cp -rf ../build/docs/javadoc/* $version/
 
-# Create latest-stable symlink if not a SNAPSHOT version
+# Create latest-stable with Jekyll redirect if not a SNAPSHOT version
 if [ "$is_snapshot" = false ]; then
-    echo "Creating latest-stable symlink..."
+    echo "Creating latest-stable redirect..."
     rm -rf latest-stable
-    ln -s $version latest-stable
+    mkdir latest-stable
+    cat > latest-stable/index.html << EOF
+---
+layout: redirect
+redirect_to: /$repository_name/$version/
+---
+EOF
 
     echo "Creating robots.txt..."
     cat > robots.txt << EOF
