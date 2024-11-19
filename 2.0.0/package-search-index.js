@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.eclipse.keypop.reader"},{"l":"org.eclipse.keypop.reader.selection"},{"l":"org.eclipse.keypop.reader.selection.spi"},{"l":"org.eclipse.keypop.reader.spi"}]
