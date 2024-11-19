@@ -29,18 +29,12 @@ mkdir $version
 
 echo "Copy javadoc files..."
 cp -rf ../build/docs/javadoc/* $version/
-
-# Create latest-stable with Jekyll redirect if not a SNAPSHOT version
+# Create latest-stable copy if not a SNAPSHOT version
 if [ "$is_snapshot" = false ]; then
-    echo "Creating latest-stable redirect..."
+    echo "Creating latest-stable directory..."
     rm -rf latest-stable
     mkdir latest-stable
-    cat > latest-stable/index.html << EOF
----
-layout: redirect
-redirect_to: /$repository_name/$version/
----
-EOF
+    cp -rf $version/* latest-stable/
 
     echo "Creating robots.txt..."
     cat > robots.txt << EOF
@@ -50,7 +44,6 @@ Allow: /latest-stable/
 Disallow: /*/[0-9]*/
 EOF
 fi
-
 echo "Update versions list..."
 echo "| Version | Documents |" > list_versions.md
 echo "|:---:|---|" >> list_versions.md
@@ -73,7 +66,5 @@ done
 
 echo "Computed all versions:"
 cat list_versions.md
-
 cd ..
-
 echo "Local docs update finished."
