@@ -66,7 +66,7 @@ for directory in $sorted_dirs
 do
     # If this is the stable version, write latest-stable entry first
     if [ "$directory" = "$latest_stable" ]; then
-        echo "| latest-stable ($latest_stable) | [API documentation](latest-stable) |" >> list_versions.md
+        echo "| latest-stable ($latest_stable) | [API documentation] (latest-stable) |" >> list_versions.md
     fi
     echo "| $directory | [API documentation]($directory) |" >> list_versions.md
 done
