@@ -59,6 +59,7 @@ tasks {
             events("passed", "skipped", "failed")
         }
     }
+}
 
 publishing {
     publications {
