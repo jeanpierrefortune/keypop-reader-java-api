@@ -59,4 +59,60 @@ tasks {
             events("passed", "skipped", "failed")
         }
     }
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["kotlin"])
+            artifact(sourcesJar)
+            artifact(javadocJar)
+            pom {
+                name.set("Keypop Gradle Plugin")
+                description.set("Gradle Plugin that regroups common tasks used by all Keypop Projects.")
+                url.set("https://projects.eclipse.org/projects/iot.keypop")
+                organization {
+                    name.set("Eclipse Keypop")
+                    url.set("https://projects.eclipse.org/projects/iot.keypop")
+                }
+                licenses {
+                    license {
+                        name.set("Eclipse Public License - v 2.0")
+                        url.set("https://www.eclipse.org/legal/epl-2.0/")
+                        distribution.set("repo")
+                    }
+                }
+                developers {
+                    developer {
+                        name.set("Andrei Cristea")
+                        email.set("andrei.cristea019@gmail.com")
+                    }
+                    developer {
+                        name.set("Jean-Pierre Fortune")
+                        email.set("jean-pierre.fortune@ialto.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/eclipse-keypop/keypop-ops.git")
+                    developerConnection.set("scm:git:https://github.com/eclipse-keypop/keypop-ops.git")
+                    url.set("http://github.com/eclipse-keypop/keypop-ops/tree/main")
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username = sonatypeUsername
+                password = sonatypePassword
+            }
+            url = uri(sonatypeURL)
+        }
+    }
+}
+
+if (project.hasProperty("RELEASE")) {
+    signing {
+        useGpgCmd()
+        sign(publishing.publications["mavenJava"])
+    }
 }
