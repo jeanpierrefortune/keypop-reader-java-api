@@ -17,11 +17,7 @@ buildscript {
         mavenLocal()
         mavenCentral()
     }
-    dependencies {
-        classpath("org.eclipse.keypop:keypop-gradle:0.1.+") { isChanging = true }
-    }
 }
-apply(plugin = "org.eclipse.keypop")
 
 ///////////////////////////////////////////////////////////////////////////////
 //  APP CONFIGURATION
