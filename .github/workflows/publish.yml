@@ -1,0 +1,14 @@
+name: Publish Snapshot package
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    uses: jeanpierrefortune/keypop.keypop-actions/.github/workflows/publish-snapshot.yml@publish-snapshot-v1
+    secrets:
+      CENTRAL_SONATYPE_TOKEN_USERNAME: abcddefg
+      CENTRAL_SONATYPE_TOKEN_PASSWORD: abcddefg
