@@ -1,9 +1,17 @@
+///////////////////////////////////////////////////////////////////////////////
+//  GRADLE CONFIGURATION
+///////////////////////////////////////////////////////////////////////////////
+
+// The 'maven-publish' and 'signing' plugins are required for publishing and signing artifacts.
 plugins {
     java
     `maven-publish`
     signing
     id("com.diffplug.spotless") version "6.25.0"
 }
+
+// The buildscript block is a legacy way to apply plugins, but it's kept here
+// as it was in the original file for the custom 'keypop' plugin.
 buildscript {
     repositories {
         mavenLocal()
@@ -22,7 +30,9 @@ repositories {
     mavenLocal()
     mavenCentral()
 }
+
 dependencies {
+    // Corrected to a valid JUnit BOM version.
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -35,6 +45,7 @@ java {
     sourceCompatibility = JavaVersion.toVersion(javaSourceLevel)
     targetCompatibility = JavaVersion.toVersion(javaTargetLevel)
     println("Compiling Java $sourceCompatibility to Java $targetCompatibility.")
+    // These two lines automatically configure the sources and Javadoc JARs for publishing.
     withJavadocJar()
     withSourcesJar()
 }
@@ -43,15 +54,14 @@ java {
 //  TASKS CONFIGURATION
 ///////////////////////////////////////////////////////////////////////////////
 tasks {
-    val sourcesJar by creating(Jar::class) {
-        archiveClassifier.set("sources")
-        from(sourceSets.main.get().allSource)
+    // Configure the existing 'test' task provided by the Java plugin
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
-    val javadocJar by creating(Jar::class) {
-        archiveClassifier.set("javadoc")
-        from(tasks.javadoc.get())
-    }
-
+    // Configure spotless via its extension
     spotless {
         java {
             target("src/**/*.java")
@@ -61,21 +71,18 @@ tasks {
             googleJavaFormat()
         }
     }
-
-    test {
-        useJUnitPlatform()
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-    }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//  PUBLISHING CONFIGURATION
+//  This block must be at the top level, not inside 'tasks'.
+///////////////////////////////////////////////////////////////////////////////
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
+            // 'from(components["java"])' now automatically includes the main, sources, and javadoc jars
+            // because of the 'withSourcesJar()' and 'withJavadocJar()' configuration above.
             from(components["java"])
-            artifact(tasks.getByName("sourcesJar"))
-            artifact(tasks.getByName("javadocJar"))
 
             pom {
                 name.set("Keypop Gradle Plugin")
@@ -112,6 +119,8 @@ publishing {
     }
     repositories {
         maven {
+            // It's safer to check if properties exist before using them.
+            // These properties must be provided via gradle.properties or command line.
             if (project.hasProperty("sonatypeURL")) {
                 url = uri(project.property("sonatypeURL") as String)
                 credentials {
@@ -123,7 +132,9 @@ publishing {
     }
 }
 
+// The signing block should also be at the top level.
 signing {
+    // Only sign if the 'RELEASE' property is set, which is a good practice.
     if (project.hasProperty("RELEASE")) {
         useGpgCmd()
         sign(publishing.publications["mavenJava"])
