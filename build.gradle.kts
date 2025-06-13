@@ -1,8 +1,7 @@
-///////////////////////////////////////////////////////////////////////////////
-//  GRADLE CONFIGURATION
-///////////////////////////////////////////////////////////////////////////////
 plugins {
     java
+    `maven-publish`
+    signing
     id("com.diffplug.spotless") version "6.25.0"
 }
 buildscript {
@@ -24,7 +23,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.assertj:assertj-core:3.25.3")
@@ -44,6 +43,15 @@ java {
 //  TASKS CONFIGURATION
 ///////////////////////////////////////////////////////////////////////////////
 tasks {
+    val sourcesJar by creating(Jar::class) {
+        archiveClassifier.set("sources")
+        from(sourceSets.main.get().allSource)
+    }
+    val javadocJar by creating(Jar::class) {
+        archiveClassifier.set("javadoc")
+        from(tasks.javadoc.get())
+    }
+
     spotless {
         java {
             target("src/**/*.java")
@@ -53,6 +61,7 @@ tasks {
             googleJavaFormat()
         }
     }
+
     test {
         useJUnitPlatform()
         testLogging {
@@ -64,9 +73,10 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            from(components["kotlin"])
-            artifact(sourcesJar)
-            artifact(javadocJar)
+            from(components["java"])
+            artifact(tasks.getByName("sourcesJar"))
+            artifact(tasks.getByName("javadocJar"))
+
             pom {
                 name.set("Keypop Gradle Plugin")
                 description.set("Gradle Plugin that regroups common tasks used by all Keypop Projects.")
@@ -102,17 +112,19 @@ publishing {
     }
     repositories {
         maven {
-            credentials {
-                username = sonatypeUsername
-                password = sonatypePassword
+            if (project.hasProperty("sonatypeURL")) {
+                url = uri(project.property("sonatypeURL") as String)
+                credentials {
+                    username = project.property("sonatypeUsername") as String
+                    password = project.property("sonatypePassword") as String
+                }
             }
-            url = uri(sonatypeURL)
         }
     }
 }
 
-if (project.hasProperty("RELEASE")) {
-    signing {
+signing {
+    if (project.hasProperty("RELEASE")) {
         useGpgCmd()
         sign(publishing.publications["mavenJava"])
     }
